@@ -1,0 +1,13 @@
+.idea/
+
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+staticfiles/
+
+.DRAPI/settings.py
+db.sqlite3
