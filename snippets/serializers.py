@@ -3,20 +3,43 @@ from .models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 from django.contrib.auth.models import User
 
 
-class SnippetSerializer(serializers.ModelSerializer):
+class SnippetSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    highlight = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')
+
     class Meta:
         model = Snippet
-        fields = ['id', 'title', 'owner', 'code', 'linenos', 'language', 'style']
+        fields = ['url', 'id', 'highlight', 'owner',
+                  'title', 'code', 'linenos', 'language', 'style']
 
-    owner = serializers.ReadOnlyField(source='owner.username')
 
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    snippets = serializers.HyperlinkedRelatedField(many=True, view_name='snippet-detail', read_only=True)
 
-class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'snippets']
+        fields = ['url', 'id', 'username', 'snippets']
 
+# __________________________________________________
+# Сериализаторы на основе модели, без связей
+# ---------------------------------------------------
+# class SnippetSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Snippet
+#         fields = ['id', 'title', 'owner', 'code', 'linenos', 'language', 'style']
+#
+#     owner = serializers.ReadOnlyField(source='owner.username')
+#
+#
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ['id', 'username', 'snippets']
+
+
+# __________________________________________________
 # Простой сериализатор, индентичен джанговской форме
+# ---------------------------------------------------
 # class SnippetSerializer(serializers.Serializer):
 #     id = serializers.IntegerField(read_only=True)
 #     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
